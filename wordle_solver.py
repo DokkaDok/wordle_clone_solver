@@ -7,7 +7,7 @@ random_word = ''
 
 #window size
 WIN_WIDTH = 560
-WIN_HEIGHT = 700
+WIN_HEIGHT = 800
 
 pygame.display.set_caption("Wordle Clone/Solver")
 
@@ -89,7 +89,7 @@ def main():
     window.fill(black)
     #rendering squares
     for i in range(5):
-        for j in range(5):
+        for j in range(6):
             pygame.draw.rect(window, grey, pygame.Rect(60+(i*90), 50+(j*90), 80, 80), 2)
 
     #turns counter += 1 with each && if > 5 lose
@@ -112,50 +112,50 @@ def main():
                 if event.key == pygame.K_RETURN and win == True:
                     main()
                 #new game condition
-                if event.key == pygame.K_RETURN and turns == 5:
+                if event.key == pygame.K_RETURN and turns == 6:
                     main()
                 #autosolve
                 if event.key == pygame.K_SPACE and win != True:
-                    for i in range(5-turns):
+                    for i in range(6-turns):
                         chosen_word = random.choice(all_words)
                         win = check_word(chosen_word, window, turns)
                         turns += 1
-                        window.fill(black,(0,500,500,200))
+                        window.fill(black,(0,600,600,300))
                         #break when won
                         if chosen_word == random_word:
                             break
                 #del letter 
-                if event.key == pygame.K_BACKSPACE or len(user_input) > 5:
+                if event.key == pygame.K_BACKSPACE or len(user_input) > 6:
                     user_input = user_input[:-1]
                 #validate user input // check win condition
                 if event.key == pygame.K_RETURN and len(user_input) > 4:
                     win = check_word(user_input, window, turns)
                     turns += 1
                     user_input = ""
-                    window.fill(black,(0,500,500,200))
+                    window.fill(black,(0,600,600,300))
             
             #render user input and text for autosolve
-            window.fill(black,(0,500,500,200))
+            window.fill(black,(0,600,600,300))
             user_guess = font.render(user_input, True, grey)
-            window.blit(user_guess, (227, 500))
+            window.blit(user_guess, (215, 600))
             Solve = font.render((f"Press SPACE to solve"), True, grey)
-            window.blit(Solve, (120, 550))
+            window.blit(Solve, (125, 700))
 
             Continue = font.render((f"Press ENTER to continue"), True, grey)
             
             #render victory screen // clean autosolve text
             if win == True:
                 Won = font.render((f"You won! Turns: {turns}"), True, green)
-                window.fill(black, (0,500,500,200))
-                window.blit(Won, (147, 500))
-                window.blit(Continue, (90, 600))
+                window.fill(black, (0,600,600,300))
+                window.blit(Won, (147, 600))
+                window.blit(Continue, (90, 700))
             
             #render lose screen // clean autosolve text
-            if turns == 5 and win != True:
+            if turns == 6 and win != True:
                 Lost = font.render((f"You Lose! Correct word: {random_word}"), True, red)
-                window.fill(black, (0,500,500,200))
-                window.blit(Lost, (45, 500))
-                window.blit(Continue, (90, 600))
+                window.fill(black, (0,600,600,300))
+                window.blit(Lost, (45, 600))
+                window.blit(Continue, (90, 700))
             
             #tickrate
             pygame.display.update()
