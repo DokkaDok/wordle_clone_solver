@@ -43,7 +43,7 @@ def check_word(word, window, turns):
 
             else:
                 if word[i] in random_word:
-                    if user_guess.count(user_guess[i]) > 1 and color[user_guess.index(user_guess[i])] != grey:
+                    if word.count(word[i]) > 1 and color[word.index(word[i])] != grey:
                         color[i] = grey
                         all_words = [element for element in all_words if word[i] != element[i] and word[i] in element]
                     else:
