@@ -5,6 +5,7 @@ pygame.init()
 all_words = []
 random_word = ''
 
+#window size
 WIN_WIDTH = 560
 WIN_HEIGHT = 700
 
@@ -19,32 +20,39 @@ red = (170,67,68,255)
 
 font = pygame.font.SysFont("Helvetica neue", 46)
 
+#reading words file to all_words - all possible solutions
 def create_array():
     with open('words.txt') as words:
         for word in words:
             all_words.append(word.rstrip('\n').upper())
 
+#check if grey/yellow/green
 def check_word(word, window, turns):
+    global all_words
+    #initial render values
     user_guess = ["","","","",""]
     spacing = 0
     color = [grey, grey, grey, grey, grey]
     
     for i in range(5):
-
-        global all_words
-
+        #creating new list without grey letters for autosolve
         if word[i] not in random_word:
             all_words = [element for element in all_words if word[i] not in element and element.count(word[i]) != 1]
-            
+        
+        #green
         else:
             if word[i] == random_word[i]:
                 color[i] = green
+                #new list only green for autosolve
                 all_words = [element for element in all_words if word[i] == element[i]]
 
+            #yellow
             else:
                 if word[i] in random_word:
+                    #check if yellow already exists to not repeat
                     if word.count(word[i]) > 1 and color[word.index(word[i])] != grey:
                         color[i] = grey
+                        #new list only with yellows and greens for autosolve
                         all_words = [element for element in all_words if word[i] != element[i] and word[i] in element]
                     else:
                         color[i] = yellow
@@ -52,6 +60,7 @@ def check_word(word, window, turns):
             
         list(word)
 
+        #rendering colors and letters
         user_guess[i] = font.render(word[i], True, white)
         pygame.draw.rect(window, color[i], pygame.Rect(60 + spacing, 50+ (turns*90), 80, 80))
         window.blit(user_guess[i], (90 + spacing, 80 + (turns*90)))
@@ -69,17 +78,21 @@ def main():
     FPS = 30
     clock = pygame.time.Clock()
     
+    #solution
     random_word = random.choice(all_words)
+    #inputs for user and autosolve
     user_input = ""
     chosen_word = ""
     
+    #rendering window
     window = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     window.fill(black)
-    
+    #rendering squares
     for i in range(5):
         for j in range(5):
             pygame.draw.rect(window, grey, pygame.Rect(60+(i*90), 50+(j*90), 80, 80), 2)
 
+    #turns counter += 1 with each && if > 5 lose
     turns = 0
     win = False
     
@@ -91,33 +104,37 @@ def main():
                 pygame.quit()
                 sys.exit()
 
+            #user input
             if event.type == pygame.KEYDOWN:
                 user_input += event.unicode.upper()
             
+                #new game condition
                 if event.key == pygame.K_RETURN and win == True:
                     main()
-                
+                #new game condition
                 if event.key == pygame.K_RETURN and turns == 5:
                     main()
-                    
+                #autosolve
                 if event.key == pygame.K_SPACE and win != True:
                     for i in range(5-turns):
                         chosen_word = random.choice(all_words)
                         win = check_word(chosen_word, window, turns)
                         turns += 1
                         window.fill(black,(0,500,500,200))
+                        #break when won
                         if chosen_word == random_word:
                             break
-                    
+                #del letter 
                 if event.key == pygame.K_BACKSPACE or len(user_input) > 5:
                     user_input = user_input[:-1]
-                    
+                #validate user input // check win condition
                 if event.key == pygame.K_RETURN and len(user_input) > 4:
                     win = check_word(user_input, window, turns)
                     turns += 1
                     user_input = ""
                     window.fill(black,(0,500,500,200))
-                
+            
+            #render user input and text for autosolve
             window.fill(black,(0,500,500,200))
             user_guess = font.render(user_input, True, grey)
             window.blit(user_guess, (227, 500))
@@ -126,18 +143,21 @@ def main():
 
             Continue = font.render((f"Press ENTER to continue"), True, grey)
             
+            #render victory screen // clean autosolve text
             if win == True:
                 Won = font.render((f"You won! Turns: {turns}"), True, green)
                 window.fill(black, (0,500,500,200))
                 window.blit(Won, (147, 500))
                 window.blit(Continue, (90, 600))
-                
+            
+            #render lose screen // clean autosolve text
             if turns == 5 and win != True:
                 Lost = font.render((f"You Lose! Correct word: {random_word}"), True, red)
                 window.fill(black, (0,500,500,200))
                 window.blit(Lost, (45, 500))
                 window.blit(Continue, (90, 600))
             
+            #tickrate
             pygame.display.update()
             clock.tick(FPS)
 
